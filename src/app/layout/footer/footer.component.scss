@@ -1,0 +1,60 @@
+/* Asegura que el html y el body ocupen toda la altura de la ventana */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* El contenedor principal de contenido debe ocupar el espacio restante */
+.content {
+    flex: 1;
+    /* Otros estilos de tu contenido principal */
+}
+
+/* Estilos del footer */
+.footer {
+    padding: 12px;
+    font-size: 12px;
+    background: #3f51b5;
+    color: #fff;
+    /* Asegura que el footer esté al final del contenedor */
+    width: 100%;
+}
+
+/* Estilos de la lista del footer */
+.footer-list {
+    align-items: center;
+    display: flex;
+    flex-flow: row wrap;
+    padding: 8px;
+}
+
+/* Estilos para las secciones dentro del footer */
+.footer-logo {
+    flex: 1;
+}
+
+.footer-version {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.footer-copyright {
+    margin-top: 0;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    min-width: 225px;
+    margin-top: 16px;
+}
+
+/* Estilo para los enlaces dentro del footer */
+.footer a {
+    font-size: 16px;
+    padding: 0;
+    text-decoration: none;
+    color: inherit;
+}

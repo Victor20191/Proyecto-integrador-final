@@ -1,0 +1,35 @@
+<form [formGroup]="formularioContacto" (ngSubmit)="submit()">
+  <div class="container">
+    <div class="mb-3">
+      <select class="form-select" formControlName="area">
+        <option value="">Seleccione un área</option>
+        <option *ngFor="let area of areas" [value]="area.id">
+          {{area.nombreArea}}
+        </option>
+      </select>
+      <div *ngIf="formularioContacto.get('area')?.invalid && (formularioContacto.get('area')?.dirty || formularioContacto.get('area')?.touched)" class="text-danger">
+        Por favor, seleccione un área.
+      </div>
+    </div>
+    <div *ngIf="mostrarVehiculo()" class="mb-3">
+      <select class="form-select" formControlName="vehiculo">
+        <option value="">Seleccione un vehículo</option>
+        <option *ngFor="let vehiculo of vehiculos" [value]="vehiculo.id">
+          {{vehiculo.placa}}
+        </option>
+      </select>
+      <div *ngIf="formularioContacto.get('vehiculo')?.invalid && (formularioContacto.get('vehiculo')?.dirty || formularioContacto.get('vehiculo')?.touched)" class="text-danger">
+        Por favor, seleccione un vehículo.
+      </div>
+    </div>
+    <div class="mb-3">
+      <label for="comentario" class="form-label">Comentario</label>
+      <textarea class="form-control" id="comentario" rows="3" formControlName="comentario" style="height: 70vh;"></textarea>
+      <div *ngIf="formularioContacto.get('comentario')?.invalid && (formularioContacto.get('comentario')?.dirty || formularioContacto.get('comentario')?.touched)" class="text-danger">
+        Por favor, ingresa las lecturas QR.
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="!formularioContacto.valid">Enviar</button>
+  </div>
+</form>
+<div>{{datos | json}}</div>
