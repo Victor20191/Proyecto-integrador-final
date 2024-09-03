@@ -1,7 +1,7 @@
 <form [formGroup]="formularioContacto" (ngSubmit)="submit()">
   <div class="container">
     <div class="mb-3">
-      <select class="form-select" formControlName="area">
+      <select class="form-select custom-border" formControlName="area">
         <option value="">Seleccione un área</option>
         <option *ngFor="let area of areas" [value]="area.id">
           {{area.nombreArea}}
@@ -12,7 +12,7 @@
       </div>
     </div>
     <div *ngIf="mostrarVehiculo()" class="mb-3">
-      <select class="form-select" formControlName="vehiculo">
+      <select class="form-select custom-border" formControlName="vehiculo">
         <option value="">Seleccione un vehículo</option>
         <option *ngFor="let vehiculo of vehiculos" [value]="vehiculo.id">
           {{vehiculo.placa}}
@@ -23,8 +23,8 @@
       </div>
     </div>
     <div class="mb-3">
-      <label for="comentario" class="form-label">Comentario</label>
-      <textarea class="form-control" id="comentario" rows="3" formControlName="comentario" style="height: 70vh;"></textarea>
+      <label for="comentario" class="form-label">Lecturas QR</label>
+      <textarea class="form-control custom-border" id="comentario" rows="3" formControlName="comentario" style="height: 70vh;"></textarea>
       <div *ngIf="formularioContacto.get('comentario')?.invalid && (formularioContacto.get('comentario')?.dirty || formularioContacto.get('comentario')?.touched)" class="text-danger">
         Por favor, ingresa las lecturas QR.
       </div>

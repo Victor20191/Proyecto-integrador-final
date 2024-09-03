@@ -36,7 +36,6 @@ export class ReadingQrComponent implements OnInit {
       comentario: ['', Validators.required]
     });
 
-    // Escuchar cambios en el campo 'area'
     this.formularioContacto.get('area')?.valueChanges.subscribe(areaId => {
       if (areaId === '3' || areaId === '4') {
         this.formularioContacto.get('vehiculo')?.setValidators(Validators.required);
