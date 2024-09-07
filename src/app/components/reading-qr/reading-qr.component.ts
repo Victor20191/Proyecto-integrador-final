@@ -1,14 +1,16 @@
-import { NgFor, NgIf,JsonPipe } from '@angular/common';
+import { NgFor, NgIf,JsonPipe,CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, FormsModule, Validators, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AreaQr } from '../../interface/interface-menu';
+import { ServicesService } from '../../services/services.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-reading-qr',
   standalone: true,
-  imports: [NgFor, MatSelectModule, FormsModule, ReactiveFormsModule, JsonPipe,NgIf],
+  imports: [NgFor, MatSelectModule, FormsModule, ReactiveFormsModule, JsonPipe,NgIf,HttpClientModule,CommonModule],
   templateUrl: './reading-qr.component.html',
   styleUrl: './reading-qr.component.scss'
 })

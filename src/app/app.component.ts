@@ -7,11 +7,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ReadingQrComponent,HeaderComponent,FooterComponent,MatButtonModule,MatToolbarModule,MatIconModule,NgbModule],
+  imports: [RouterOutlet, ReadingQrComponent,HeaderComponent,FooterComponent,MatButtonModule,MatToolbarModule,MatIconModule,NgbModule,HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
