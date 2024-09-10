@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
-import { LeerDatosComponent } from './components/leer-datos/leer-datos.component';
+import { ReadingQrComponent } from './components/reading-qr/reading-qr.component';
+import { ReporteQrComponent } from './components/reporte-qr/reporte-qr.component';
 
 export const routes: Routes = [
-    {path:'consultar', component:LeerDatosComponent}
+    { path: '', component: ReadingQrComponent }, 
+    { path: 'inicio', component: ReadingQrComponent },   
+    { path: 'reporte', component: ReporteQrComponent }
 ];

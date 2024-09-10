@@ -1,12 +1,13 @@
+
 <form [formGroup]="formularioContacto" (ngSubmit)="submit()">
   <div class="container">
+    <div class="mt-2 text-success font-weight-bold">Total lecturas QR: <span>{{ qrCount }}</span></div>
     <div class="mb-3">
-      <select class="form-select custom-border" formControlName="area">
-        <option value="">Seleccione un área</option>
-        <option *ngFor="let area of areas" [value]="area.id">
-          {{area.nombreArea}}
-        </option>
+      <select id="sedeSelect" #areaSelect formControlName="area" class="form-select custom-border">
+        <option value="" disabled selected>Seleccione un área</option>
+        <option *ngFor="let area of areas" [value]="area.id">{{ area.nombreArea }}</option>
       </select>
+  
       <div *ngIf="formularioContacto.get('area')?.invalid && (formularioContacto.get('area')?.dirty || formularioContacto.get('area')?.touched)" class="text-danger">
         Por favor, seleccione un área.
       </div>
@@ -24,12 +25,12 @@
     </div>
     <div class="mb-3">
       <label for="comentario" class="form-label">Lecturas QR</label>
-      <textarea class="form-control custom-border" id="comentario" rows="3" formControlName="comentario" style="height: 70vh;"></textarea>
+      
+      <textarea class="form-control custom-border" id="comentario" rows="3" #TextAreaQr formControlName="comentario" style="height: 70vh;"></textarea>
       <div *ngIf="formularioContacto.get('comentario')?.invalid && (formularioContacto.get('comentario')?.dirty || formularioContacto.get('comentario')?.touched)" class="text-danger">
         Por favor, ingresa las lecturas QR.
       </div>
     </div>
-    <button type="submit" class="btn btn-primary" [disabled]="!formularioContacto.valid">Enviar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="!formularioContacto.valid || isSubmitting">Enviar</button>
   </div>
 </form>
-<div>{{datos | json}}</div>

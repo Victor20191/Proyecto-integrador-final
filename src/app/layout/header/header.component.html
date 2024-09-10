@@ -1,10 +1,21 @@
-<mat-toolbar color="primary" class="navbar navbar-dark bg-primary mb-2">
-    <span class="app-logo">App - QR</span>
-    <span class="example-spacer"></span>
-  
-    <button mat-button [routerLink]="['/']" routerLinkActive="active">
-      Inicio
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-2">
+  <div class="container-fluid">
+    <a (click)="onLogoClick($event)" routerLink="/">
+      <img src="https://elzarzal.com/wp-content/uploads/2019/07/logo.png" alt="Logo" width="60" height="60" class="d-inline-block align-top">
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
     </button>
-  
-    <span class="menu-spacer"></span>
-  </mat-toolbar>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" routerLink="/inicio">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" routerLink="/reporte">Reporte</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<router-outlet></router-outlet>
