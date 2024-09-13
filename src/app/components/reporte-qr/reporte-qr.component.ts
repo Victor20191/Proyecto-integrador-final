@@ -82,8 +82,8 @@ export class ReporteQrComponent implements OnInit, AfterViewInit {
       return (
         (!searchTerms.id || data.id.toString().toLowerCase().includes(searchTerms.id.toLowerCase())) &&
         (!searchTerms.fecha_registro || 
-          ((!searchTerms.fechaInicio || fechaRegistro >= new Date(searchTerms.fechaInicio)) &&
-           (!searchTerms.fechaFin || fechaRegistro <= new Date(searchTerms.fechaFin)))) &&
+        ((!searchTerms.fechaInicio || fechaRegistro >= new Date(searchTerms.fechaInicio)) &&
+        (!searchTerms.fechaFin || fechaRegistro <= new Date(searchTerms.fechaFin)))) &&
         (!searchTerms.area_captura || data.area_captura.toLowerCase().includes(searchTerms.area_captura.toLowerCase())) &&
         (!searchTerms.vehiculo || data.vehiculo.toLowerCase().includes(searchTerms.vehiculo.toLowerCase())) &&
         (!searchTerms.lectura || data.lectura.toLowerCase().includes(searchTerms.lectura.toLowerCase()))
@@ -104,7 +104,7 @@ export class ReporteQrComponent implements OnInit, AfterViewInit {
     } else {
       this.filterObject.fechaFin = date;
     }
-    this.filterObject.fecha_registro = true; // Indicador para filtrar por fecha_registro
+    this.filterObject.fecha_registro = true;
     this.applyFilterToDataSource();
   }
 

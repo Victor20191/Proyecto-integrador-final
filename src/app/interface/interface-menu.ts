@@ -29,3 +29,7 @@ export interface QrLectura {
     lectura: string;
   }
   
+  export interface Login{
+    usuario:string,
+    password:string
+  }

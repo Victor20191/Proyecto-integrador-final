@@ -1,0 +1,21 @@
+<div class="body">
+  <div class="login" style="display: flex; flex-direction: column; align-items: center;">
+    <mat-spinner *ngIf="loading" diameter="50" class="spiner"></mat-spinner>
+
+    <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="ingresar()" style="display: flex; flex-direction: column; align-items: center;">
+      <h4>Iniciar Sesión</h4>
+
+      <mat-form-field class="ancho" style="width: 100%;">
+        <mat-label>Usuario</mat-label>
+        <input matInput autocomplete="off" formControlName="user">
+      </mat-form-field>
+
+      <mat-form-field class="ancho" style="width: 100%;">
+        <mat-label>Contraseña</mat-label>
+        <input type="password" matInput autocomplete="off" formControlName="password">
+      </mat-form-field>
+      <br>
+      <button mat-flat-button color="primary" class="ancho" style="border-radius: 0; width: 100%;" type="submit" [disabled]="form.invalid">Ingresar</button>
+    </form>
+  </div>
+</div>
