@@ -5,6 +5,11 @@ import { FormBuilder, FormsModule, Validators, FormGroup } from '@angular/forms'
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { HeaderComponent } from '../../layout/header/header.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+
 
 //Componentes aplicación
 import { AreaQr, QrLectura } from '../../interface/interface-menu';
@@ -25,7 +30,11 @@ import { ServicesService } from '../../services/services.service';
     HttpClientModule,
     CommonModule,
     SweetAlert2Module,
-    HeaderComponent
+    HeaderComponent,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule
     
   ],
   providers: [ServicesService],
@@ -158,5 +167,31 @@ export class ReadingQrComponent implements OnInit {
   mostrarVehiculo(): boolean {
     const areaId = this.formularioContacto.get('area')?.value;
     return areaId === '3' || areaId === '4';
+  }
+
+  limpiarFormulario() {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Se borrarán todos los datos ingresados",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, borrar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.formularioContacto.reset();
+        this.qrCount = 0;
+        if (this.areaSelect) {
+          this.areaSelect.nativeElement.focus();
+        }
+        Swal.fire(
+          'Borrado',
+          'Los datos han sido borrados',
+          'success'
+        )
+      }
+    })
   }
 }

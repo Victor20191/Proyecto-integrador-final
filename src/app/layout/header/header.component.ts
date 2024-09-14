@@ -22,6 +22,6 @@ constructor(private router:Router){}
 onLogoClick(event: Event): void {
   event.preventDefault();
   console.log('Logo clicked!');
-  this.router.navigate(['/']);
+  this.router.navigate(['/inicio']);
 }
 }
