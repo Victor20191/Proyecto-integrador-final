@@ -3,6 +3,8 @@
     <mat-spinner *ngIf="loading" diameter="50" class="spiner"></mat-spinner>
 
     <form *ngIf="!loading" [formGroup]="form" (ngSubmit)="ingresar()" style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://elzarzal.com/wp-content/uploads/2019/07/logo.png" alt="Logo" width="80" height="80" class="d-inline-block align-top">
+      <br>
       <h4>Iniciar Sesión</h4>
 
       <mat-form-field class="ancho" style="width: 100%;">

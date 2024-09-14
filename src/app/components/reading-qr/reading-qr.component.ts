@@ -4,6 +4,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, FormsModule, Validators, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HeaderComponent } from '../../layout/header/header.component';
 
 //Componentes aplicación
 import { AreaQr, QrLectura } from '../../interface/interface-menu';
@@ -23,7 +24,9 @@ import { ServicesService } from '../../services/services.service';
     NgIf,
     HttpClientModule,
     CommonModule,
-    SweetAlert2Module
+    SweetAlert2Module,
+    HeaderComponent
+    
   ],
   providers: [ServicesService],
   templateUrl: './reading-qr.component.html',

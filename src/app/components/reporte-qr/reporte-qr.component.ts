@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServicesService } from '../../services/services.service';
 import { LecturasQrDb } from '../../interface/interface-menu';
 import { DatePipe } from '@angular/common';
+import { HeaderComponent } from '../../layout/header/header.component';
 
 @Component({
   selector: 'app-reporte-qr',
@@ -29,7 +30,8 @@ import { DatePipe } from '@angular/common';
     MatNativeDateModule,
     MatButtonModule,
     MatTooltipModule,
-    DatePipe
+    DatePipe,
+    HeaderComponent
   ],
   providers: [DatePipe]
 })

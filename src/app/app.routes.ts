@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { ReadingQrComponent } from './components/reading-qr/reading-qr.component';
 import { ReporteQrComponent } from './components/reporte-qr/reporte-qr.component';
-import { LoginComponent } from './components/login/login.component';
 import { Login2Component } from './components/login2/login2.component';
 
 export const routes: Routes = [
