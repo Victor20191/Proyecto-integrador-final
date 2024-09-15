@@ -1,8 +1,11 @@
 export interface AreaQr {
-    id:string,
-    nombreArea:string
+    id: number;
+    id_area: number;
+    area: string;
+    sede: string;
+    fecha_creacion?: string;
 }
-export interface Vehiculo{
+export interface VehiculoQr{
     id:string,
     placa:string
 }

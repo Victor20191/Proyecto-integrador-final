@@ -10,9 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 
-
-//Componentes aplicación
-import { AreaQr, QrLectura } from '../../interface/interface-menu';
+import { AreaQr, QrLectura, VehiculoQr } from '../../interface/interface-menu';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { ServicesService } from '../../services/services.service';
@@ -21,21 +19,9 @@ import { ServicesService } from '../../services/services.service';
   selector: 'app-reading-qr',
   standalone: true,
   imports: [
-    NgFor,
-    MatSelectModule,
-    FormsModule,
-    ReactiveFormsModule,
-    JsonPipe,
-    NgIf,
-    HttpClientModule,
-    CommonModule,
-    SweetAlert2Module,
-    HeaderComponent,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatCardModule
-    
+    NgFor, MatSelectModule, FormsModule, ReactiveFormsModule, JsonPipe, NgIf,
+    HttpClientModule, CommonModule, SweetAlert2Module, HeaderComponent,
+    MatFormFieldModule, MatInputModule, MatButtonModule, MatCardModule
   ],
   providers: [ServicesService],
   templateUrl: './reading-qr.component.html',
@@ -49,18 +35,8 @@ export class ReadingQrComponent implements OnInit {
   @ViewChild('areaSelect') areaSelect!: ElementRef;
   @ViewChild('TextAreaQr') TextAreaQr!: ElementRef;
 
-  areas: AreaQr[] = [
-    { id: '1', nombreArea: 'Producto terminado' },
-    { id: '2', nombreArea: 'Almacenamiento Cava' },
-    { id: '3', nombreArea: 'Entrega Cedi Medellin' },
-    { id: '4', nombreArea: 'Recibo Cedi Medellin' }
-  ];
-
-  vehiculos = [
-    { id: '1', placa: 'ABC123' },
-    { id: '2', placa: 'DEF456' },
-    { id: '3', placa: 'GHI789' }
-  ];
+  areas: AreaQr[] = [];
+  vehiculos: VehiculoQr[] = [];
 
   constructor(private fb: FormBuilder, private servicesService: ServicesService) {
     this.formularioContacto = this.fb.group({
@@ -74,15 +50,18 @@ export class ReadingQrComponent implements OnInit {
     });
 
     this.formularioContacto.get('area')?.valueChanges.subscribe(areaId => {
+      console.log('Área seleccionada (desde suscripción):', areaId);
       if (areaId) {
         setTimeout(() => {
           this.TextAreaQr.nativeElement.focus();
         }, 0);
       }
 
-      if (areaId === '3' || areaId === '4') {
+      if (this.mostrarVehiculo()) {
+        console.log('Mostrando campo de vehículo');
         this.formularioContacto.get('vehiculo')?.setValidators(Validators.required);
       } else {
+        console.log('Ocultando campo de vehículo');
         this.formularioContacto.get('vehiculo')?.clearValidators();
         this.formularioContacto.get('vehiculo')?.setValue('');
       }
@@ -90,15 +69,58 @@ export class ReadingQrComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.ConsultArea();
+    this.ConsultaVehiculos();
+  }
 
-  // Método para actualizar el contador de códigos QR
   updateQrCount(value: string) {
     const qrCodes = value.trim().split('\n').filter(Boolean);
     this.qrCount = qrCodes.length;
   }
 
-  // Envío de datos del formulario
+  ConsultArea() {
+    this.servicesService.areaCapturaQr().subscribe({
+      next: (data: AreaQr[]) => {
+        this.areas = data;
+        console.log('Áreas cargadas:', this.areas);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error al consultar áreas', error);
+        Swal.fire({
+          title: 'Error',
+          text: `Hubo un error al consultar las áreas: ${error.message}`,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+
+  ConsultaVehiculos() {
+    this.servicesService.vehiculosCapturaQr().subscribe({
+      next: (data: VehiculoQr[]) => {
+        this.vehiculos = data;
+        console.log('Vehículos cargados:', this.vehiculos);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error al consultar vehículos', error);
+        Swal.fire({
+          title: 'Error',
+          text: `Hubo un error al consultar los vehículos: ${error.message}`,
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+
+  mostrarVehiculo(): boolean {
+    const areaId = this.formularioContacto.get('area')?.value;
+    console.log('Área seleccionada en mostrarVehiculo:', areaId);
+    return areaId === 3 || areaId === 4 || areaId === 5;
+  }
+
   submit() {
     if (this.formularioContacto.valid) {
       this.isSubmitting = true;
@@ -115,22 +137,21 @@ export class ReadingQrComponent implements OnInit {
         lectura: codigo
       }));
 
-      this.servicesService.enviarLecturas(qrLecturas).subscribe(
-        (response) => {
-          console.log('Datos enviados correctamente');
+      this.servicesService.enviarLecturas(qrLecturas).subscribe({
+        next: (response) => {
+          console.log('Datos enviados correctamente', response);
           this.showAlert();
           this.formularioContacto.reset();
           this.areaSelect.nativeElement.focus();
         },
-        (error: HttpErrorResponse) => {
+        error: (error: HttpErrorResponse) => {
           console.error('Error al enviar los datos', error);
-          console.error('Status:', error.status);
-          console.error('Status Text:', error.statusText);
-          console.error('Error:', error.error);
           this.showErrorAlert(error.message);
+        },
+        complete: () => {
+          this.isSubmitting = false;
+          Swal.close();
         }
-      ).add(() => {
-        this.isSubmitting = false;
       });
     }
   }
@@ -140,7 +161,8 @@ export class ReadingQrComponent implements OnInit {
       title: '¡Éxito!',
       text: 'Datos enviados correctamente',
       icon: 'success',
-      confirmButtonText: 'OK'
+      confirmButtonText: 'OK',
+      allowOutsideClick: false
     });
   }
 
@@ -162,11 +184,6 @@ export class ReadingQrComponent implements OnInit {
         Swal.showLoading();
       }
     });
-  }
-
-  mostrarVehiculo(): boolean {
-    const areaId = this.formularioContacto.get('area')?.value;
-    return areaId === '3' || areaId === '4';
   }
 
   limpiarFormulario() {

@@ -1,18 +1,17 @@
 <app-header></app-header>
 <form [formGroup]="formularioContacto" (ngSubmit)="submit()">
   <div class="container">
-    <!-- <div class="mt-2 text-success font-weight-bold">Total lecturas QR: <span>{{ qrCount }}</span></div> -->
     <mat-card class="mb-3">
       <mat-card-content>
         <h5 class="mat-h2">Total lecturas QR: <span class="mat-h1 text-success">{{ qrCount }}</span></h5>
       </mat-card-content>
     </mat-card>
+    
     <mat-form-field appearance="fill" class="w-100">
       <mat-label>Seleccione un área</mat-label>
-      <mat-select formControlName="area">
-        <mat-option [value]="">Seleccione un área</mat-option>
-        <mat-option *ngFor="let area of areas" [value]="area.id">
-          {{ area.nombreArea }}
+      <mat-select formControlName="area" #areaSelect>
+        <mat-option *ngFor="let area of areas" [value]="area.id_area">
+          {{ area.area }}
         </mat-option>
       </mat-select>
       <mat-error *ngIf="formularioContacto.get('area')?.invalid && (formularioContacto.get('area')?.dirty || formularioContacto.get('area')?.touched)">
@@ -23,7 +22,7 @@
     <mat-form-field appearance="fill" class="w-100" *ngIf="mostrarVehiculo()">
       <mat-label>Seleccione un vehículo</mat-label>
       <mat-select formControlName="vehiculo">
-        <mat-option [value]="">Seleccione un vehículo</mat-option>
+        <!-- <mat-option [value]="">Seleccione un vehículo</mat-option> -->
         <mat-option *ngFor="let vehiculo of vehiculos" [value]="vehiculo.id">
           {{vehiculo.placa}}
         </mat-option>
@@ -35,19 +34,23 @@
 
     <mat-form-field appearance="fill" class="w-100">
       <mat-label>Lecturas QR</mat-label>
-      <textarea matInput formControlName="comentario" rows="3" style="height: 70vh;"></textarea>
+      <textarea matInput formControlName="comentario" rows="3" style="height: 70vh;" #TextAreaQr></textarea>
       <mat-error *ngIf="formularioContacto.get('comentario')?.invalid && (formularioContacto.get('comentario')?.dirty || formularioContacto.get('comentario')?.touched)">
         Por favor, ingresa las lecturas QR.
       </mat-error>
     </mat-form-field>
 
-    <button mat-flat-button color="primary" type="submit" [disabled]="!formularioContacto.valid || isSubmitting" style="border-radius: 0; width: 10%; margin-left: 1px;">Enviar</button>
+    <button mat-flat-button color="primary" type="submit" 
+            [disabled]="!formularioContacto.valid || isSubmitting" 
+            style="border-radius: 0; width: 10%; margin-left: 1px;">
+      Enviar
+    </button>
 
     <button mat-flat-button color="warn" type="button" 
-    (click)="limpiarFormulario()"
-    [disabled]="formularioContacto.pristine"
-    style="border-radius: 0; width: 10%;">
-  Borrar
-</button>
+            (click)="limpiarFormulario()"
+            [disabled]="formularioContacto.pristine"
+            style="border-radius: 0; width: 10%;">
+      Borrar
+    </button>
   </div>
 </form>
