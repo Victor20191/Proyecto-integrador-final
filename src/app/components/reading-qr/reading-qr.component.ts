@@ -1,5 +1,5 @@
 import { NgFor, NgIf, JsonPipe, CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, FormsModule, Validators, FormGroup } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { AreaQr, QrLectura, VehiculoQr } from '../../interface/interface-menu';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { ServicesService } from '../../services/services.service';
+import { Subscription, Subject } from 'rxjs';
+import { debounceTime, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reading-qr',
@@ -27,7 +29,7 @@ import { ServicesService } from '../../services/services.service';
   templateUrl: './reading-qr.component.html',
   styleUrls: ['./reading-qr.component.scss']
 })
-export class ReadingQrComponent implements OnInit {
+export class ReadingQrComponent implements OnInit, OnDestroy {
   formularioContacto: FormGroup;
   isSubmitting = false;
   qrCount = 0;
@@ -37,6 +39,10 @@ export class ReadingQrComponent implements OnInit {
 
   areas: AreaQr[] = [];
   vehiculos: VehiculoQr[] = [];
+
+  private subscriptions: Subscription[] = [];
+  private areaSubject = new Subject<void>();
+  private vehiculoSubject = new Subject<void>();
 
   constructor(private fb: FormBuilder, private servicesService: ServicesService) {
     this.formularioContacto = this.fb.group({
@@ -60,6 +66,7 @@ export class ReadingQrComponent implements OnInit {
       if (this.mostrarVehiculo()) {
         console.log('Mostrando campo de vehículo');
         this.formularioContacto.get('vehiculo')?.setValidators(Validators.required);
+        this.vehiculoSubject.next();
       } else {
         console.log('Ocultando campo de vehículo');
         this.formularioContacto.get('vehiculo')?.clearValidators();
@@ -70,8 +77,14 @@ export class ReadingQrComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.setupAreaDebounce();
+    this.setupVehiculoDebounce();
     this.ConsultArea();
-    this.ConsultaVehiculos();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.servicesService.cancelPendingRequests();
   }
 
   updateQrCount(value: string) {
@@ -79,40 +92,46 @@ export class ReadingQrComponent implements OnInit {
     this.qrCount = qrCodes.length;
   }
 
-  ConsultArea() {
-    this.servicesService.areaCapturaQr().subscribe({
-      next: (data: AreaQr[]) => {
-        this.areas = data;
+  setupAreaDebounce() {
+    const sub = this.areaSubject.pipe(
+      debounceTime(100),
+      switchMap(() => this.servicesService.areaCapturaQr()),
+      catchError(error => {
+        this.showErrorAlert(`Error al cargar áreas: ${error.message}`);
+        return [];
+      })
+    ).subscribe(
+      areas => {
+        this.areas = areas;
         console.log('Áreas cargadas:', this.areas);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Error al consultar áreas', error);
-        Swal.fire({
-          title: 'Error',
-          text: `Hubo un error al consultar las áreas: ${error.message}`,
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
       }
-    });
+    );
+    this.subscriptions.push(sub);
+  }
+
+  setupVehiculoDebounce() {
+    const sub = this.vehiculoSubject.pipe(
+      debounceTime(100),
+      switchMap(() => this.servicesService.vehiculosCapturaQr()),
+      catchError(error => {
+        this.showErrorAlert(`Error al cargar vehículos: ${error.message}`);
+        return [];
+      })
+    ).subscribe(
+      vehiculos => {
+        this.vehiculos = vehiculos;
+        console.log('Vehículos cargados:', this.vehiculos);
+      }
+    );
+    this.subscriptions.push(sub);
+  }
+
+  ConsultArea() {
+    this.areaSubject.next();
   }
 
   ConsultaVehiculos() {
-    this.servicesService.vehiculosCapturaQr().subscribe({
-      next: (data: VehiculoQr[]) => {
-        this.vehiculos = data;
-        console.log('Vehículos cargados:', this.vehiculos);
-      },
-      error: (error: HttpErrorResponse) => {
-        console.error('Error al consultar vehículos', error);
-        Swal.fire({
-          title: 'Error',
-          text: `Hubo un error al consultar los vehículos: ${error.message}`,
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
-      }
-    });
+    this.vehiculoSubject.next();
   }
 
   mostrarVehiculo(): boolean {
@@ -137,7 +156,7 @@ export class ReadingQrComponent implements OnInit {
         lectura: codigo
       }));
 
-      this.servicesService.enviarLecturas(qrLecturas).subscribe({
+      const sub = this.servicesService.enviarLecturas(qrLecturas).subscribe({
         next: (response) => {
           console.log('Datos enviados correctamente', response);
           this.showAlert();
@@ -153,6 +172,7 @@ export class ReadingQrComponent implements OnInit {
           Swal.close();
         }
       });
+      this.subscriptions.push(sub);
     }
   }
 
@@ -169,7 +189,7 @@ export class ReadingQrComponent implements OnInit {
   showErrorAlert(errorMessage: string) {
     Swal.fire({
       title: 'Error',
-      text: `Hubo un error al enviar los datos: ${errorMessage}`,
+      text: errorMessage,
       icon: 'error',
       confirmButtonText: 'OK'
     });

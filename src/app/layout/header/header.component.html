@@ -1,25 +1,30 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-2">
   <div class="container-fluid">
-    <a (click)="onLogoClick($event)" routerLink="/inicio">
+    <a class="navbar-brand" routerLink="/inicio">
       <img src="https://elzarzal.com/wp-content/uploads/2019/07/logo.png" alt="Logo" width="60" height="60" class="d-inline-block align-top">
     </a>
+    
+    <span class="navbar-text me-auto text-light" *ngIf="userName">
+      Bienvenido, {{ userName }}
+    </span>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
+    
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="/inicio">Inicio</a>
+          <a class="nav-link btn btn-outline-light mx-1" routerLink="/inicio" routerLinkActive="active">Inicio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="/reporte">Reporte</a>
+          <a class="nav-link btn btn-outline-light mx-1" routerLink="/reporte" routerLinkActive="active">Reporte</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="/login2">
+          <a class="nav-link btn btn-outline-light mx-1" (click)="logout($event)">
             <mat-icon>exit_to_app</mat-icon>
           </a>
         </li>
-
       </ul>
     </div>
   </div>

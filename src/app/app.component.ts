@@ -33,7 +33,7 @@ import { RouterModule, Routes } from '@angular/router';
     RouterModule,
   ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']  // También corrige styleUrl a styleUrls
+  styleUrls: ['./app.component.scss'] 
 })
 export class AppComponent {
   title = 'app-qr';

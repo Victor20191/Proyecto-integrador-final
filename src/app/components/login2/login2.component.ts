@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgModule } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,24 +7,24 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgIf } from '@angular/common';
-import { ServicesService } from '../../services/services.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login2',
   standalone: true,
-  imports: [MatSelectModule, MatInputModule, MatFormFieldModule, MatButtonModule, ReactiveFormsModule, MatSnackBarModule, MatProgressSpinnerModule, NgIf],
+  imports: [MatSelectModule,MatInputModule,MatButtonModule,MatProgressSpinnerModule,NgIf,ReactiveFormsModule,MatSnackBarModule,MatFormFieldModule],
   templateUrl: './login2.component.html',
-  styleUrl: './login2.component.scss'
+  styleUrls: ['./login2.component.scss']
 })
 export class Login2Component implements OnInit {
   form: FormGroup;
   loading = false;
 
   constructor(
-    private fb: FormBuilder, 
-    private _snackBar: MatSnackBar, 
-    private servicesService: ServicesService,
+    private fb: FormBuilder,
+    private _snackBar: MatSnackBar,
+    private authService: AuthService,
     private router: Router
   ) {
     this.form = this.fb.group({
@@ -36,6 +35,9 @@ export class Login2Component implements OnInit {
 
   ngOnInit(): void {
     console.log('Login2Component inicializado');
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/inicio']);
+    }
   }
 
   ingresar() {
@@ -44,10 +46,9 @@ export class Login2Component implements OnInit {
       const user = this.form.value.user;
       const password = this.form.value.password;
 
-      this.servicesService.loginUser(user, password).subscribe({
+      this.authService.login(user, password).subscribe({
         next: (response) => {
           console.log('Respuesta del servidor:', response);
-          this.loading = false;
           if (response.success) {
             this.router.navigate(['/inicio']);
           } else {
@@ -56,8 +57,10 @@ export class Login2Component implements OnInit {
         },
         error: (error) => {
           console.error('Error en login', error);
+          this.error('Error al intentar iniciar sesión: ' + error.message);
+        },
+        complete: () => {
           this.loading = false;
-          this.error('Error al intentar iniciar sesión');
         }
       });
     } else {
@@ -66,7 +69,7 @@ export class Login2Component implements OnInit {
   }
 
   error(message: string) {
-    this._snackBar.open(message, '', {
+    this._snackBar.open(message, 'Cerrar', {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom'
