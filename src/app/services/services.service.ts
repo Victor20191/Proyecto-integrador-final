@@ -1,8 +1,9 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, Subject, of, timer } from 'rxjs';
 import { catchError, takeUntil, retry, shareReplay, tap, switchMap, startWith } from 'rxjs/operators';
 import { LecturasQrDb, InterfaceDb, QrLectura, Login, AreaQr, VehiculoQr } from '../interface/interface-menu';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class ServicesService {
   private cacheAreas$: Observable<AreaQr[]> | null = null;
   private cacheVehiculos$: Observable<VehiculoQr[]> | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private authService: AuthService) { }
 
   loginUser(user: string, password: string): Observable<any> {
     return this.http.post(`${this.BASE_URL}/api/login`, { user, password }).pipe(
@@ -26,9 +27,15 @@ export class ServicesService {
       catchError(this.handleError)
     );
   }
-
-  enviarLecturas(lecturas: QrLectura[]) {
-    return this.http.post<string>(`${this.BASE_URL}/api/insertar`, lecturas).pipe(
+  enviarLecturas(lecturas: QrLectura[]): Observable<any> {
+    const userId = this.authService.currentUserValue?.id;
+    const lecturasConUsuario = lecturas.map(lectura => ({
+      ...lectura,
+      id_usuario: userId
+    }));
+    
+    return this.http.post<any>(`${this.BASE_URL}/api/insertar`, lecturasConUsuario).pipe(
+      tap(response => console.log('Respuesta del servidor:', response)),
       catchError(this.handleError)
     );
   }

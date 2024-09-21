@@ -5,34 +5,39 @@ export interface AreaQr {
     sede: string;
     fecha_creacion?: string;
 }
-export interface VehiculoQr{
-    id:string,
-    placa:string
+
+export interface VehiculoQr {
+    id: string,
+    placa: string
 }
-//Interface para base de datos
+
 export interface InterfaceDb {
-    // id:number
-    // fechaRegistro:string
-    area_captura:string
+    area_captura: string
     vehiculo: string
-    lectura:string
+    lectura: string
 }
 
 export interface LecturasQrDb {
-    id:number
-    fecha_registro:string
-    area_captura:string
-    vehiculo: string
-    lectura:string
-}
-// interface-menu.ts
+    fecha_registro: string;
+    nombre_area: string;
+    placa_vehiculo: string;
+    nombre_usuario: string;
+    orden_produccion: string;
+    referencia: string;
+    unidades: string;
+    lote: string;
+    fecha_vencimiento: string;
+    numero_corbata: string;
+  }
+
 export interface QrLectura {
     area_captura: string;
     vehiculo: string;
     lectura: string;
-  }
-  
-  export interface Login{
-    usuario:string,
-    password:string
-  }
+    id_usuario: number; 
+}
+
+export interface Login {
+    usuario: string,
+    password: string
+}

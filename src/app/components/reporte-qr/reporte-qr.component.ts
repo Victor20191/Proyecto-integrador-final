@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -11,8 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServicesService } from '../../services/services.service';
 import { LecturasQrDb } from '../../interface/interface-menu';
-import { DatePipe } from '@angular/common';
 import { HeaderComponent } from '../../layout/header/header.component';
+import { MatDatepicker } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-reporte-qr',
@@ -20,6 +21,7 @@ import { HeaderComponent } from '../../layout/header/header.component';
   styleUrls: ['./reporte-qr.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
@@ -30,50 +32,55 @@ import { HeaderComponent } from '../../layout/header/header.component';
     MatNativeDateModule,
     MatButtonModule,
     MatTooltipModule,
-    DatePipe,
     HeaderComponent
   ],
   providers: [DatePipe]
 })
 export class ReporteQrComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['id', 'fecha_registro', 'area_captura', 'vehiculo', 'lectura'];
+  displayedColumns: string[] = ['fecha_registro', 'nombre_area', 'placa_vehiculo', 'nombre_usuario', 'orden_produccion', 'referencia', 'unidades', 'lote', 'fecha_vencimiento', 'numero_corbata'];
   dataSource: MatTableDataSource<LecturasQrDb>;
   filterObject: any = {};
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('pickerStart') pickerStart!: MatDatepicker<Date>;
+  @ViewChild('pickerEnd') pickerEnd!: MatDatepicker<Date>;
 
   constructor(private servicesService: ServicesService, private datePipe: DatePipe) {
-    this.dataSource = new MatTableDataSource<LecturasQrDb>([]);
+    this.dataSource = new MatTableDataSource<LecturasQrDb>();
   }
 
   ngOnInit(): void {
     this.loadData();
   }
 
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+    this.dataSource.sortingDataAccessor = (item: LecturasQrDb, property: string): string | number => {
+      switch(property) {
+        case 'fecha_registro': 
+          return new Date(item.fecha_registro).getTime();
+        default: 
+          return item[property as keyof LecturasQrDb] as string | number || '';
+      }
+    };
+    this.dataSource.filterPredicate = this.createFilter();
+  }
+
   loadData() {
+    console.log('Iniciando carga de datos...');
     this.servicesService.consultarDb().subscribe(
       (data: LecturasQrDb[]) => {
+        console.log('Datos recibidos:', data);
         this.dataSource.data = data;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
       },
       (error) => {
         console.error('Error al obtener los datos:', error);
       }
     );
-  }
-
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-    this.dataSource.sortingDataAccessor = (item: LecturasQrDb, property: string) => {
-      switch(property) {
-        case 'fecha_registro': 
-          return new Date(item.fecha_registro).getTime();
-        default: 
-          return item[property as keyof LecturasQrDb];
-      }
-    };
-    this.dataSource.filterPredicate = this.createFilter();
   }
 
   createFilter(): (data: LecturasQrDb, filter: string) => boolean {
@@ -82,13 +89,17 @@ export class ReporteQrComponent implements OnInit, AfterViewInit {
       const fechaRegistro = new Date(data.fecha_registro);
       
       return (
-        (!searchTerms.id || data.id.toString().toLowerCase().includes(searchTerms.id.toLowerCase())) &&
-        (!searchTerms.fecha_registro || 
-        ((!searchTerms.fechaInicio || fechaRegistro >= new Date(searchTerms.fechaInicio)) &&
-        (!searchTerms.fechaFin || fechaRegistro <= new Date(searchTerms.fechaFin)))) &&
-        (!searchTerms.area_captura || data.area_captura.toLowerCase().includes(searchTerms.area_captura.toLowerCase())) &&
-        (!searchTerms.vehiculo || data.vehiculo.toLowerCase().includes(searchTerms.vehiculo.toLowerCase())) &&
-        (!searchTerms.lectura || data.lectura.toLowerCase().includes(searchTerms.lectura.toLowerCase()))
+        (!searchTerms.fechaInicio || fechaRegistro >= new Date(searchTerms.fechaInicio)) &&
+        (!searchTerms.fechaFin || fechaRegistro <= new Date(searchTerms.fechaFin)) &&
+        (!searchTerms.nombre_area || data.nombre_area.toLowerCase().includes(searchTerms.nombre_area.toLowerCase())) &&
+        (!searchTerms.placa_vehiculo || (data.placa_vehiculo ?? '').toLowerCase().includes(searchTerms.placa_vehiculo.toLowerCase())) &&
+        (!searchTerms.nombre_usuario || (data.nombre_usuario ?? '').toLowerCase().includes(searchTerms.nombre_usuario.toLowerCase())) &&
+        (!searchTerms.orden_produccion || (data.orden_produccion ?? '').toLowerCase().includes(searchTerms.orden_produccion.toLowerCase())) &&
+        (!searchTerms.referencia || (data.referencia ?? '').toLowerCase().includes(searchTerms.referencia.toLowerCase())) &&
+        (!searchTerms.unidades || (data.unidades ?? '').toLowerCase().includes(searchTerms.unidades.toLowerCase())) &&
+        (!searchTerms.lote || (data.lote ?? '').toLowerCase().includes(searchTerms.lote.toLowerCase())) &&
+        (!searchTerms.fecha_vencimiento || (data.fecha_vencimiento ?? '').toLowerCase().includes(searchTerms.fecha_vencimiento.toLowerCase())) &&
+        (!searchTerms.numero_corbata || (data.numero_corbata ?? '').toLowerCase().includes(searchTerms.numero_corbata.toLowerCase()))
       );
     };
   }
@@ -106,19 +117,18 @@ export class ReporteQrComponent implements OnInit, AfterViewInit {
     } else {
       this.filterObject.fechaFin = date;
     }
-    this.filterObject.fecha_registro = true;
     this.applyFilterToDataSource();
   }
 
-  clearDateFilter(isStartDate: boolean) {
+  clearDateFilter(isStartDate: boolean, inputElement: HTMLInputElement) {
     if (isStartDate) {
       delete this.filterObject.fechaInicio;
+      this.pickerStart.close();
     } else {
       delete this.filterObject.fechaFin;
+      this.pickerEnd.close();
     }
-    if (!this.filterObject.fechaInicio && !this.filterObject.fechaFin) {
-      delete this.filterObject.fecha_registro;
-    }
+    inputElement.value = '';
     this.applyFilterToDataSource();
   }
 

@@ -1,3 +1,5 @@
+// reading-qr.component.ts
+
 import { NgFor, NgIf, JsonPipe, CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -9,11 +11,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AreaQr, QrLectura, VehiculoQr } from '../../interface/interface-menu';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import Swal from 'sweetalert2';
 import { ServicesService } from '../../services/services.service';
+import { AuthService } from '../../services/auth.service';
 import { Subscription, Subject } from 'rxjs';
 import { debounceTime, switchMap, catchError } from 'rxjs/operators';
 
@@ -44,7 +48,12 @@ export class ReadingQrComponent implements OnInit, OnDestroy {
   private areaSubject = new Subject<void>();
   private vehiculoSubject = new Subject<void>();
 
-  constructor(private fb: FormBuilder, private servicesService: ServicesService) {
+  constructor(
+    private fb: FormBuilder, 
+    private servicesService: ServicesService,
+    private authService: AuthService,
+    private snackBar: MatSnackBar
+  ) {
     this.formularioContacto = this.fb.group({
       area: ['', Validators.required],
       vehiculo: [''],
@@ -140,39 +149,96 @@ export class ReadingQrComponent implements OnInit, OnDestroy {
     return areaId === 3 || areaId === 4 || areaId === 5;
   }
 
-  submit() {
-    if (this.formularioContacto.valid) {
-      this.isSubmitting = true;
-      this.SwalWaitAlert();
+//submit
 
-      const area = this.formularioContacto.get('area')?.value;
-      const vehiculo = this.formularioContacto.get('vehiculo')?.value;
-      const qrCodes = this.formularioContacto.get('comentario')?.value.trim();
-      const qrCode: string[] = qrCodes.split('\n').filter(Boolean);
+submit() {
+  if (this.formularioContacto.valid) {
+    this.isSubmitting = true;
 
-      const qrLecturas: QrLectura[] = qrCode.map((codigo: string) => ({
-        area_captura: area,
-        vehiculo: vehiculo || '',
-        lectura: codigo
-      }));
+    const area = this.formularioContacto.get('area')?.value;
+    const vehiculo = this.formularioContacto.get('vehiculo')?.value;
+    const qrCodes = this.formularioContacto.get('comentario')?.value.trim();
+    const qrCode: string[] = qrCodes.split('\n').filter(Boolean);
 
-      const sub = this.servicesService.enviarLecturas(qrLecturas).subscribe({
-        next: (response) => {
-          console.log('Datos enviados correctamente', response);
-          this.showAlert();
-          this.formularioContacto.reset();
-          this.areaSelect.nativeElement.focus();
-        },
-        error: (error: HttpErrorResponse) => {
-          console.error('Error al enviar los datos', error);
-          this.showErrorAlert(error.message);
-        },
-        complete: () => {
-          this.isSubmitting = false;
-          Swal.close();
-        }
-      });
-      this.subscriptions.push(sub);
+    const qrLecturas: QrLectura[] = qrCode.map((codigo: string) => ({
+      area_captura: area,
+      vehiculo: vehiculo || '',
+      lectura: codigo,
+      id_usuario: this.authService.currentUserValue?.id
+    }));
+
+    this.servicesService.enviarLecturas(qrLecturas).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servidor en el componente:', response);
+        this.showNotification(`Se insertaron ${response.count} registros correctamente.`);
+        this.resetForm();
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('Error al enviar los datos', error);
+        this.showNotification(error.message || 'Error desconocido al enviar los datos', true);
+      },
+      complete: () => {
+        console.log('Operación completada');
+        this.isSubmitting = false;
+      }
+    });
+  } else {
+    this.showNotification('Por favor, complete todos los campos requeridos.', true);
+  }
+}
+
+
+  // submit() {
+  //   if (this.formularioContacto.valid) {
+  //     this.isSubmitting = true;
+  //     this.SwalWaitAlert();
+  
+  //     const area = this.formularioContacto.get('area')?.value;
+  //     const vehiculo = this.formularioContacto.get('vehiculo')?.value;
+  //     const qrCodes = this.formularioContacto.get('comentario')?.value.trim();
+  //     const qrCode: string[] = qrCodes.split('\n').filter(Boolean);
+  
+  //     const qrLecturas: QrLectura[] = qrCode.map((codigo: string) => ({
+  //       area_captura: area,
+  //       vehiculo: vehiculo || '',
+  //       lectura: codigo,
+  //       id_usuario: this.authService.currentUserValue?.id
+  //     }));
+  
+  //     console.log('Enviando lecturas:', qrLecturas);
+  
+  //     const sub = this.servicesService.enviarLecturas(qrLecturas).subscribe({
+  //       next: (response) => {
+  //         console.log('Respuesta del servidor:', response);
+  //         this.showAlert();
+  //         this.resetForm();
+  //       },
+  //       error: (error: HttpErrorResponse) => {
+  //         console.error('Error al enviar los datos', error);
+  //         this.showErrorAlert(error.message || 'Error desconocido al enviar los datos');
+  //       },
+  //       complete: () => {
+  //         console.log('Operación completada');
+  //         this.isSubmitting = false;
+  //         Swal.close();
+  //       }
+  //     });
+  //     this.subscriptions.push(sub);
+  //   } else {
+  //     console.log('Formulario inválido', this.formularioContacto.errors);
+  //     this.showErrorAlert('Por favor, complete todos los campos requeridos.');
+  //   }
+  // }
+
+
+
+  //submit/
+  
+  private resetForm() {
+    this.formularioContacto.reset();
+    this.qrCount = 0;
+    if (this.areaSelect) {
+      this.areaSelect.nativeElement.focus();
     }
   }
 
@@ -230,5 +296,13 @@ export class ReadingQrComponent implements OnInit, OnDestroy {
         )
       }
     })
+  }
+  showNotification(message: string, isError: boolean = false) {
+    this.snackBar.open(message, 'Cerrar', {
+      duration: 10000, // 5 segundos
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: isError ? ['error-snackbar'] : ['success-snackbar']
+    });
   }
 }
