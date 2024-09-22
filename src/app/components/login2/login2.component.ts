@@ -50,6 +50,9 @@ export class Login2Component implements OnInit {
         next: (response) => {
           console.log('Respuesta del servidor:', response);
           if (response.success) {
+            const userRole = this.authService.getUserRole();
+            console.log('Rol del usuario:', userRole);
+            // Aquí puedes implementar lógica basada en el rol si es necesario
             this.router.navigate(['/inicio']);
           } else {
             this.error(response.message || 'Credenciales inválidas');

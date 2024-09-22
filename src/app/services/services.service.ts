@@ -34,9 +34,14 @@ export class ServicesService {
       id_usuario: userId
     }));
     
+    console.log('Enviando datos al servidor:', lecturasConUsuario);
+    
     return this.http.post<any>(`${this.BASE_URL}/api/insertar`, lecturasConUsuario).pipe(
       tap(response => console.log('Respuesta del servidor:', response)),
-      catchError(this.handleError)
+      catchError(error => {
+        console.error('Error detallado:', error);
+        return throwError(() => new Error(`Error del servidor: ${error.status}, ${error.message}`));
+      })
     );
   }
 

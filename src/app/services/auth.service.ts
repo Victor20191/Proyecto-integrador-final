@@ -11,10 +11,10 @@ import { isPlatformBrowser } from '@angular/common';
 export class AuthService {
   private currentUserSubject: BehaviorSubject<any>;
   public currentUser: Observable<any>;
-  private apiUrl = 'http://localhost:4001'; // Asegúrate de que esta URL sea correcta
+  private apiUrl = 'http://localhost:4001';
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
@@ -61,13 +61,16 @@ export class AuthService {
     return !!this.currentUserValue;
   }
 
+  getUserRole(): string | null {
+    const currentUser = this.currentUserValue;
+    return currentUser ? currentUser.nombre_rol : null;
+  }
+
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred';
     if (error.error instanceof ErrorEvent) {
-      // Client-side or network error
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // Backend error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
     console.error(errorMessage);

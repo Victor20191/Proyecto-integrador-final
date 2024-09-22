@@ -1,5 +1,3 @@
-// reading-qr.component.ts
-
 import { NgFor, NgIf, JsonPipe, CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
@@ -149,7 +147,6 @@ export class ReadingQrComponent implements OnInit, OnDestroy {
     return areaId === 3 || areaId === 4 || areaId === 5;
   }
 
-//submit
 
 submit() {
   if (this.formularioContacto.valid) {
@@ -231,8 +228,6 @@ submit() {
   // }
 
 
-
-  //submit/
   
   private resetForm() {
     this.formularioContacto.reset();
