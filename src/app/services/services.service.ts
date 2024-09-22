@@ -21,12 +21,24 @@ export class ServicesService {
       catchError(this.handleError)
     );
   }
+//consultar
 
-  consultarDb(): Observable<LecturasQrDb[]> {
-    return this.http.get<LecturasQrDb[]>(`${this.BASE_URL}/api/reporte`).pipe(
-      catchError(this.handleError)
-    );
-  }
+consultarDb(): Observable<LecturasQrDb[]> {
+  const currentUser = this.authService.currentUserValue;
+  const userId = currentUser?.id;
+  const userRole = currentUser?.nombre_rol;
+
+  return this.http.get<LecturasQrDb[]>(`${this.BASE_URL}/api/reporte`, {
+    params: { 
+      userId: userId ? userId.toString() : '', 
+      userRole: userRole || ''
+    }
+  }).pipe(
+    catchError(this.handleError)
+  );
+}
+
+  //
   enviarLecturas(lecturas: QrLectura[]): Observable<any> {
     const userId = this.authService.currentUserValue?.id;
     const lecturasConUsuario = lecturas.map(lectura => ({

@@ -28,6 +28,7 @@ export interface LecturasQrDb {
     lote: string;
     fecha_vencimiento: string;
     numero_corbata: string;
+    id_usuario:string;
   }
 
 export interface QrLectura {

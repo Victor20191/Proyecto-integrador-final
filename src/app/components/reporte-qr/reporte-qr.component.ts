@@ -14,6 +14,7 @@ import { ServicesService } from '../../services/services.service';
 import { LecturasQrDb } from '../../interface/interface-menu';
 import { HeaderComponent } from '../../layout/header/header.component';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-reporte-qr',
@@ -40,14 +41,16 @@ export class ReporteQrComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['fecha_registro', 'nombre_area', 'placa_vehiculo', 'nombre_usuario', 'orden_produccion', 'referencia', 'unidades', 'lote', 'fecha_vencimiento', 'numero_corbata'];
   dataSource: MatTableDataSource<LecturasQrDb>;
   filterObject: any = {};
+  isAdmin: boolean = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('pickerStart') pickerStart!: MatDatepicker<Date>;
   @ViewChild('pickerEnd') pickerEnd!: MatDatepicker<Date>;
 
-  constructor(private servicesService: ServicesService, private datePipe: DatePipe) {
+  constructor(private servicesService: ServicesService, private datePipe: DatePipe,private authService: AuthService) {
     this.dataSource = new MatTableDataSource<LecturasQrDb>();
+    this.isAdmin = this.authService.getUserRole()==='Administrador';
   }
 
   ngOnInit(): void {
