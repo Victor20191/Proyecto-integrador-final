@@ -3,11 +3,11 @@ const path = require('path');
 const app = express();
 
 // Sirve los archivos estáticos desde la carpeta dist/app-qr/browser
-app.use(express.static(path.join(__dirname, 'dist/app-qr/browser')));
+app.use(express.static(path.join(__dirname, 'dist/app-qr/browser/inicio')));
 
 // Maneja cualquier solicitud que no coincida con los archivos estáticos
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist/app-qr/browser/index.html'));
+  res.sendFile(path.join(__dirname, 'dist/app-qr/browser/incio/index.html'));
 });
 
 const port = process.env.PORT || 4200;
