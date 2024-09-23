@@ -3,11 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "serve -s dist/app-qr",
-    "build": "ng build --configuration production",
+    "start": "node server.js",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:app-qr": "node dist/app-qr/server/server.mjs"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
@@ -27,7 +26,7 @@
     "@sweetalert2/ngx-sweetalert2": "^12.4.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "express": "^4.18.2",
+    "express": "^4.21.0",
     "mssql": "^11.0.1",
     "rxjs": "~7.8.0",
     "serve": "^14.2.3",
