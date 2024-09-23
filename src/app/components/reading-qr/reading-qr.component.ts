@@ -294,7 +294,7 @@ submit() {
   }
   showNotification(message: string, isError: boolean = false) {
     this.snackBar.open(message, 'Cerrar', {
-      duration: 10000, // 5 segundos
+      duration: 10000,
       horizontalPosition: 'center',
       verticalPosition: 'bottom',
       panelClass: isError ? ['error-snackbar'] : ['success-snackbar']
